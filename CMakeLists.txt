@@ -46,10 +46,17 @@ install(
 # generate the library's config file
 include(CMakePackageConfigHelpers)
 
+set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/CUDACvManagedMemory
+    CACHE PATH "Location of header files" )
+    
+set(SYSCONFIG_INSTALL_DIR ${CMAKE_INSTALL_BINDIR}
+    CACHE PATH "Location of configuration files" )
+
 configure_package_config_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CUDACvManagedMemoryConfig.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/CUDACvManagedMemoryConfig.cmake"
   INSTALL_DESTINATION "lib/cmake/CUDACvManagedMemory"
+  PATH_VARS INCLUDE_INSTALL_DIR SYSCONFIG_INSTALL_DIR
 )
 
 # install the config file
