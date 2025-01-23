@@ -44,12 +44,13 @@ install(
 )
 
 # generate the library's config file
+include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/CUDACvManagedMemory
     CACHE PATH "Location of header files" )
     
-set(SYSCONFIG_INSTALL_DIR ${CMAKE_INSTALL_BINDIR}
+set(SYSCONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}
     CACHE PATH "Location of configuration files" )
 
 configure_package_config_file(
