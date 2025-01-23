@@ -47,7 +47,7 @@ install(
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/CUDACvManagedMemory
+set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/${CMAKE_PROJECT_NAME}
     CACHE PATH "Location of header files" )
     
 set(SYSCONFIG_LIBRARY_PATH ${CMAKE_INSTALL_LIBDIR}/lib${CMAKE_PROJECT_NAME}.so
