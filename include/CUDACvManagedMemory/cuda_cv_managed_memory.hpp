@@ -44,6 +44,7 @@ namespace cuda_cv_managed_memory
         uint32_t getWidth() const;
         int getCvType() const;
         uint32_t sizeInBytes() const;
+        size_t getStep() const;
         private:
             // Using unified memory
             void *unified_ptr_;

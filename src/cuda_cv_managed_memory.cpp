@@ -54,6 +54,10 @@ int CUDAManagedMemory::getCvType() const {
     return type_;
 }
 
+size_t CUDAManagedMemory::getStep() const {
+    return step_;
+}
+
 cv::Mat CUDAManagedMemory::getCvMat(){
     // https://docs.nvidia.com/cuda/cuda-for-tegra-appnote/
     // Prefetch output image data to CPU - Seems to be neccessary on Tegra SoC in multithreaded settings
