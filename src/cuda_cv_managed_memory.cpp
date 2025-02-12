@@ -1,6 +1,5 @@
 #include "CUDACvManagedMemory/cuda_cv_managed_memory.hpp"
 #include <stdexcept>
-#include "cuda_runtime.h"
 #include "driver_types.h"
 
 using namespace cuda_cv_managed_memory;
@@ -58,19 +57,19 @@ size_t CUDAManagedMemory::getStep() const {
     return step_;
 }
 
-cv::Mat CUDAManagedMemory::getCvMat(){
+cv::Mat CUDAManagedMemory::getCvMat(cudaStream_t stream){
     // https://docs.nvidia.com/cuda/cuda-for-tegra-appnote/
     // Prefetch output image data to CPU - Seems to be neccessary on Tegra SoC in multithreaded settings
-    cudaStreamAttachMemAsync(NULL, unified_ptr_, 0, cudaMemAttachHost);
-    cudaStreamSynchronize(NULL);
+    cudaStreamAttachMemAsync(stream, unified_ptr_, 0, cudaMemAttachHost);
+    cudaStreamSynchronize(stream);
     return cv::Mat(height_, width_, type_, unified_ptr_, step_);
 }
 
-cv::cuda::GpuMat CUDAManagedMemory::getCvGpuMat(){
+cv::cuda::GpuMat CUDAManagedMemory::getCvGpuMat(cudaStream_t stream){
     // https://docs.nvidia.com/cuda/cuda-for-tegra-appnote/
     // Prefetch input image data to GPU - Seems to be neccessary on Tegra SoC in multithreaded settings
-    cudaStreamAttachMemAsync(NULL, unified_ptr_, 0, cudaMemAttachGlobal);
-    cudaStreamSynchronize(NULL);
+    cudaStreamAttachMemAsync(stream, unified_ptr_, 0, cudaMemAttachGlobal);
+    cudaStreamSynchronize(stream);
     return cv::cuda::GpuMat(height_, width_, type_, unified_ptr_, step_);
 }
 

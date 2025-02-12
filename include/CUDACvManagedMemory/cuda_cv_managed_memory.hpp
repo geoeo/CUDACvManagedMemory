@@ -4,6 +4,7 @@
 #include <memory>
 #include <opencv2/core.hpp>
 #include <opencv2/core/cuda.hpp>
+#include <cuda_runtime.h>
 
 namespace cuda_cv_managed_memory
 {
@@ -25,14 +26,14 @@ namespace cuda_cv_managed_memory
         static CUDAManagedMemory::SharedPtr fromCvGpuMat(const cv::cuda::GpuMat src);
 
         /**
-         * @brief Returns an unmanaged OpenCV Mat. 
+         * @brief Returns an unmanaged OpenCV Mat. Default stream is NULL
          */
-        cv::Mat getCvMat();
+        cv::Mat getCvMat(cudaStream_t stream = NULL);
 
         /**
-         * @brief Returns an unmanaged OpenCV Cuda Mat.
+         * @brief Returns an unmanaged OpenCV Cuda Mat. Default stream is NULL
          */
-        cv::cuda::GpuMat getCvGpuMat();
+        cv::cuda::GpuMat getCvGpuMat(cudaStream_t stream = NULL);
 
         /**
          * This function exposes the raw ptr. 
