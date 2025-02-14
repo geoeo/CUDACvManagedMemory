@@ -12,8 +12,8 @@ CUDAManagedMemory::CUDAManagedMemory(size_t sizeInBytes, uint32_t height, uint32
 }
 
 CUDAManagedMemory::SharedPtr CUDAManagedMemory::fromCvMat(const cv::Mat src){
-    // CPU mem is continuous
-    auto size_in_bytes = src.cols*src.rows*src.channels();
+    // CPU mem is continuous - step should reflect this
+    auto size_in_bytes = src.step*src.rows;
     auto shared_ptr = std::shared_ptr<CUDAManagedMemory>(new CUDAManagedMemory(size_in_bytes,src.rows,src.cols, src.type(), src.step),CUDAManagedMemoryDeleter{});
     if(cudaMemcpy(shared_ptr->getRaw(), &src.data[0], size_in_bytes, cudaMemcpyDefault) != cudaError_t::cudaSuccess)
         throw std::runtime_error("CUDAManagedMemory - Failed to copy memory to CUDA unified");
