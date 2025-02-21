@@ -1,5 +1,6 @@
 #include "CUDACvManagedMemory/cuda_cv_managed_memory.hpp"
 #include <stdexcept>
+#include <sstream>
 #include "driver_types.h"
 
 using namespace cuda_cv_managed_memory;
@@ -60,17 +61,28 @@ size_t CUDAManagedMemory::getStep() const {
 cv::Mat CUDAManagedMemory::getCvMat(cudaStream_t stream){
     // https://docs.nvidia.com/cuda/cuda-for-tegra-appnote/
     // Prefetch output image data to CPU - Seems to be neccessary on Tegra SoC in multithreaded settings
-    cudaStreamAttachMemAsync(stream, unified_ptr_, 0, cudaMemAttachHost);
-    cudaStreamSynchronize(stream);
+    checkCudaError(cudaStreamAttachMemAsync(stream, unified_ptr_, 0, cudaMemAttachHost), __FILE__, __LINE__);
+    checkCudaError(cudaStreamSynchronize(stream), __FILE__, __LINE__);
+
     return cv::Mat(height_, width_, type_, unified_ptr_, step_);
 }
 
 cv::cuda::GpuMat CUDAManagedMemory::getCvGpuMat(cudaStream_t stream){
     // https://docs.nvidia.com/cuda/cuda-for-tegra-appnote/
     // Prefetch input image data to GPU - Seems to be neccessary on Tegra SoC in multithreaded settings
-    cudaStreamAttachMemAsync(stream, unified_ptr_, 0, cudaMemAttachGlobal);
-    cudaStreamSynchronize(stream);
+
+    checkCudaError(cudaStreamAttachMemAsync(stream, unified_ptr_, 0, cudaMemAttachGlobal), __FILE__, __LINE__);
+    checkCudaError(cudaStreamSynchronize(stream), __FILE__, __LINE__);
+
     return cv::cuda::GpuMat(height_, width_, type_, unified_ptr_, step_);
+}
+
+void CUDAManagedMemory::checkCudaError(cudaError_t result, const char *const file, int const line){
+    if(result != cudaError_t::cudaSuccess){
+        std::stringstream ss;
+        ss << "CUDA error at " << file <<":"<<line << " "<< cudaGetErrorString(result) << std::endl;
+        throw std::runtime_error(ss.str());
+    }
 }
 
 

@@ -54,6 +54,8 @@ namespace cuda_cv_managed_memory
             uint32_t width_;
             int type_;
             size_t step_;
+
+            static void checkCudaError(cudaError_t result, const char *const file, int const line);
             
 
     };
