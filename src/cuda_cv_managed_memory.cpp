@@ -7,17 +7,15 @@ using namespace cuda_cv_managed_memory;
 
 CUDAManagedMemory::CUDAManagedMemory(size_t sizeInBytes, uint32_t height, uint32_t width, int type, size_t step):
     size_in_bytes_(sizeInBytes), height_(height), width_(width), type_(type), step_(step) {
-    const auto cuda_res = cudaMallocManaged(&unified_ptr_, sizeInBytes);
-    if(cuda_res != cudaError_t::cudaSuccess)
-        throw std::runtime_error("CUDAManagedMemory - Runtime Cuda Error: " + std::to_string(cuda_res));
+    checkCudaError(cudaMallocManaged(&unified_ptr_, sizeInBytes), __FILE__, __LINE__);
 }
 
 CUDAManagedMemory::SharedPtr CUDAManagedMemory::fromCvMat(const cv::Mat src){
     // CPU mem is continuous - step should reflect this
     auto size_in_bytes = src.step*src.rows;
     auto shared_ptr = std::shared_ptr<CUDAManagedMemory>(new CUDAManagedMemory(size_in_bytes,src.rows,src.cols, src.type(), src.step),CUDAManagedMemoryDeleter{});
-    if(cudaMemcpy(shared_ptr->getRaw(), &src.data[0], size_in_bytes, cudaMemcpyDefault) != cudaError_t::cudaSuccess)
-        throw std::runtime_error("CUDAManagedMemory - Failed to copy memory to CUDA unified");
+    
+    checkCudaError(cudaMemcpy(shared_ptr->getRaw(), &src.data[0], size_in_bytes, cudaMemcpyDefault), __FILE__, __LINE__);
     return shared_ptr;
 }
 
@@ -25,13 +23,12 @@ CUDAManagedMemory::SharedPtr CUDAManagedMemory::fromCvGpuMat(const cv::cuda::Gpu
     auto size_in_bytes = src.step*src.rows;
     auto shared_ptr = std::shared_ptr<CUDAManagedMemory>(new CUDAManagedMemory(size_in_bytes,src.rows,src.cols, src.type(), src.step),CUDAManagedMemoryDeleter{});
 
-    if(cudaMemcpy(shared_ptr->getRaw(), src.ptr(0), size_in_bytes, cudaMemcpyDeviceToDevice) != cudaError_t::cudaSuccess)
-        throw std::runtime_error("CUDAManagedMemory - Failed to copy memory to CUDA unified");
+    checkCudaError(cudaMemcpy(shared_ptr->getRaw(), src.ptr(0), size_in_bytes, cudaMemcpyDeviceToDevice), __FILE__, __LINE__);
     return shared_ptr;
 }
 
 CUDAManagedMemory::~CUDAManagedMemory(){
-    cudaFree(unified_ptr_);
+    checkCudaError(cudaFree(unified_ptr_), __FILE__, __LINE__);
 }
 
 void* CUDAManagedMemory::getRaw() {
