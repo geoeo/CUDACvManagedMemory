@@ -60,6 +60,7 @@ cv::Mat CUDAManagedMemory::getCvMat(cudaStream_t stream){
     // Prefetch output image data to CPU - Seems to be neccessary on Tegra SoC in multithreaded settings
     checkCudaError(cudaStreamAttachMemAsync(stream, unified_ptr_, 0, cudaMemAttachHost), __FILE__, __LINE__);
     checkCudaError(cudaStreamSynchronize(stream), __FILE__, __LINE__);
+    checkCudaError( cudaGetLastError(), __FILE__, __LINE__ );
 
     return cv::Mat(height_, width_, type_, unified_ptr_, step_);
 }
@@ -70,6 +71,7 @@ cv::cuda::GpuMat CUDAManagedMemory::getCvGpuMat(cudaStream_t stream){
 
     checkCudaError(cudaStreamAttachMemAsync(stream, unified_ptr_, 0, cudaMemAttachGlobal), __FILE__, __LINE__);
     checkCudaError(cudaStreamSynchronize(stream), __FILE__, __LINE__);
+    checkCudaError( cudaGetLastError(), __FILE__, __LINE__ );
 
     return cv::cuda::GpuMat(height_, width_, type_, unified_ptr_, step_);
 }
